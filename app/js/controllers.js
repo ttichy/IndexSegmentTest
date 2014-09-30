@@ -14,7 +14,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
 
 
     var resolution = 100;
-
+    var EPSILON = 0.000000000000001; 
 
     //preselect index type
     $scope.indexType = IndexEnum.TRIANGULAR;
@@ -72,7 +72,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         //distance travelled is all the areas added up
         var distance = A1 + A2 + A3 + A4;
 
-        if (distance != (sf - s0))
+        if (Math.abs(distance - (sf - s0)) > EPSILON )
             throw new Error("calculation did not pass distance check");
 
 
@@ -90,7 +90,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         var t = t0;
 
         //doing first half
-        while (t <= halfTime) {
+        while (lessThan(t,halfTime,EPSILON)) {
 
             var s = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2);      // s = s0 + v0t + 1/2 at^2
             var v = v0 + a0 * t;
@@ -114,7 +114,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
 
         a0 = (vf - vm) / (tf - halfTime);
 
-        while (t <= tf) {
+        while (lessThan(t,tf,EPSILON)) {
 
             var time = t - halfTime;        //account for time correctly
 
@@ -132,6 +132,16 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         }
 
         return result;
+
+    }
+
+    //compare floats
+    function lessThan(numb1, numb2, epsilon) {
+
+        if (numb1 <= numb2)
+            return true;
+
+        return numb1 <= numb2 + epsilon;
 
     }
 
