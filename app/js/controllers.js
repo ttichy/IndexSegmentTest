@@ -76,7 +76,6 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
             throw new Error("calculation did not pass distance check");
 
 
-        debugger;
 
         var duration = tf - t0;
 
@@ -132,6 +131,32 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         }
 
         return result;
+
+    }
+
+
+    //calculates data for trapezoidal segment
+    var CalculateTrapezoidalSegment = function() {
+
+
+        //parse input fields as floats
+        var tf = parseFloat($scope.tf, 10);
+        var t0 = parseFloat($scope.t0, 10);
+        var v0 = parseFloat($scope.v0, 10);
+        var vf = parseFloat($scope.vf, 10);
+        var s0 = parseFloat($scope.s0, 10);
+        var sf = parseFloat($scope.sf, 10);
+
+
+        var t1 = (tf + 2 * t0) / 3;
+        var t2 = (2 * tf + t0) / 3;
+
+        var a = (t1 - t0) / 2;
+        var b = (t2 - t1);
+        var c = (tf - t2) / 2;
+
+
+
 
     }
 
