@@ -41,19 +41,12 @@
     
 
 </head>
-<body id ="outer" data-ng-controller="IndexCtrl">
-    
-   
-    <p> Index type is: {{indexType }}</p>
-
-
+    <body id ="outer" data-ng-controller="IndexCtrl">
     <div id="form_container">
 
-        <h1><a>Segment Form</a></h1>
         <form id="indexForm" class="appnitro" method="post" action="">
             <div class="form_description">
                 <h2>Segment Form</h2>
-                <p>Enter segment data</p>
             </div>
             <ul>
 
@@ -67,43 +60,38 @@
 
                         </select>
                     </div>
-                    <p class="guidelines" id="guide_7"><small>Select index type</small></p>
+
                 </li>
                 <li id="li_1">
-                    <label class="description" for="element_1">Initial Velocity </label>
-                    <div>
-                        <input data-ng-model="v0" id="element_1" name="element_1" class="element text medium" type="text" maxlength="255" value="" />
+                    <div class="left">
+                        <label class="description" for="element_1">Initial Velocity </label>
+                        <input data-ng-model="v0" id="element_1" name="element_1" class="text medium"  type="text" maxlength="255" value="" />
                     </div>
-                    <p class="guidelines" id="guide_1"><small>Initial velocity of the segment</small></p>
-                </li>
-                <li id="li_2">
-                    <label class="description" for="element_2">Final Velocity </label>
-                    <div>
-                        <input data-ng-model="vf" id="element_2" name="element_2" class="element text medium" type="text" maxlength="255" value="" />
+
+                    <div class="left">
+                        <label class="description" for="element_2">Final Velocity </label>
+                        <input data-ng-model="vf" id="element_2" name="element_2" class="text medium" type="text" maxlength="255" value="" />
                     </div>
-                    <p class="guidelines" id="guide_2"><small>Final Velocity of the segment</small></p>
                 </li>
                 <li id="li_3">
-                    <label class="description" for="element_3">Initial Position </label>
-                    <div>
-                        <input data-ng-model="s0" id="element_3" name="element_3" class="element text medium" type="text" maxlength="255" value="" />
+                    <div class="left">
+                        <label class="description" for="element_3">Initial Position </label>
+                        <input data-ng-model="s0" id="element_3" name="element_3" class=" text medium" type="text" maxlength="255" value="" />
                     </div>
-                </li>
-                <li id="li_4">
-                    <label class="description" for="element_4">Final Position </label>
-                    <div>
-                        <input data-ng-model="sf" id="element_4" name="element_4" class="element text medium" type="text" maxlength="255" value="" />
+
+                    <div class="left">
+                        <label class="description" for="element_4">Final Position </label>
+                        <input data-ng-model="sf" id="element_4" name="element_4" class=" text medium" type="text" maxlength="255" value="" />
                     </div>
                 </li>
                 <li id="li_6">
-                    <label class="description" for="element_6">Initial Time </label>
-                    <div>
-                        <input data-ng-model="t0" id="element_6" name="element_6" class="element text medium" type="text" maxlength="255" value="" />
+                    <div class="left">
+                        <label class="description" for="element_6">Initial Time </label>
+                        <input data-ng-model="t0" id="element_6" name="element_6" class=" text medium" type="text" maxlength="255" value="" />
                     </div>
-                </li>
-                <li id="li_5">
-                    <label class="description" for="element_5">Final Time </label>
-                    <div>
+
+                    <div class="left">
+                        <label class="description" for="element_5">Final Time </label>
                         <input data-ng-model="tf" id="element_5" name="element_5" class="element text medium" type="text" maxlength="255" value="" />
                     </div>
                 </li>
@@ -119,7 +107,7 @@
 
     <hr/>
 
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <div id="chart_div" style="width:900px; margin:0 auto; height: 500px;" ></div>
 
 
 

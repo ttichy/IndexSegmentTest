@@ -19,6 +19,15 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
     //preselect index type
     $scope.indexType = IndexEnum.TRIANGULAR;
 
+    //save typing for testing
+    $scope.v0 = '5';
+    $scope.vf = '10';
+    $scope.s0 = '0';
+    $scope.sf = '27.5';
+    $scope.t0 = '0';
+    $scope.tf = '2';
+
+
 
 
     //Calclate [time, position, velocity] array for the specified segment
@@ -84,7 +93,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         while (t <= halfTime) {
 
             var s = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2);      // s = s0 + v0t + 1/2 at^2
-            var v = v0 * t + a0 * t;
+            var v = v0 + a0 * t;
 
             //create time, velocity, distance point
             var point = [t, v, s];
@@ -103,14 +112,14 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         var sInit = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2); 
         var vInit = vm;
 
-        a0 = (vm - vf) / (tf - halfTime);
-
-        
+        a0 = (vf - vm) / (tf - halfTime);
 
         while (t <= tf) {
 
-            var s = sInit + vInit * t + 0.5 * a0 * Math.pow(t, 2);      // s = s0 + v0t + 1/2 at^2
-            var v = vInit * t + a0 * t;
+            var time = t - halfTime;        //account for time correctly
+
+            var s = sInit + vInit * time + 0.5 * a0 * Math.pow(time, 2);      // s = s0 + v0t + 1/2 at^2
+            var v = vInit + a0 * time;
 
             //create time, velocity, distance point
             var point = [t, v, s];
