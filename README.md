@@ -4,6 +4,5 @@
 
 Demonstrates how different types of index segments can be calculated
 
-![Example segments](http://imgur.com/bOEkPt4 "Example")
 
  
