@@ -14,7 +14,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
 
 
     var resolution = 100;
-    var EPSILON = 0.000000000000001; 
+    var EPSILON = 0.0000000000001; 
 
     //preselect index type
     $scope.indexType = IndexEnum.TRAPEZOID;
@@ -72,7 +72,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         //distance travelled is all the areas added up
         var distance = A1 + A2 + A3 + A4;
 
-        if (Math.abs(distance - (sf - s0)) > EPSILON )
+        if (!withinEpsilon(distance, sf - s0, EPSILON))
             throw new Error("calculation did not pass distance check");
 
 
@@ -165,7 +165,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         var A4 = c * vm - c * vf;
 
         var distance = A1 + A2 + A3 + A4 + A5;
-        if (Math.abs(distance - (sf - s0)) > EPSILON)
+        if (!withinEpsilon(distance,sf-s0,EPSILON))
             throw new Error("calculation did not pass distance check");
 
         //calculation will be done in thirds
@@ -184,8 +184,8 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         //doing first third
         while (lessThan(t, t1, EPSILON)) {
 
-            var s = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2);      // s = s0 + v0t + 1/2 at^2
-            var v = v0 + a0 * t;
+            var s = s0 + v0 * (t-t0) + 0.5 * a0 * Math.pow(t-t0, 2);      // s = s0 + v0t + 1/2 at^2
+            var v = v0 + a0 * (t - t0);
 
             //create time, velocity, distance point
             var point = [t, v, s];
@@ -201,7 +201,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         t = t1;
 
         //initial values in the middle of the triangle
-        var sInit = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2);
+        var sInit = s0 + v0 * (t-t0) + 0.5 * a0 * Math.pow(t-t0, 2);
         var vInit = vm;
 
         a0 = 0; //this is  a trap
@@ -262,6 +262,13 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
 
         return numb1 <= numb2 + epsilon;
 
+    }
+
+    //
+    function withinEpsilon(numb1, numb2, epsilon) {
+        if (numb1 == numb2)
+            return true;
+        return numb2 < numb1 ? numb2 > (numb1 - epsilon) : numb2 < (numb1 + epsilon);
     }
 
 
