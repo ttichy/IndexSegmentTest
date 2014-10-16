@@ -22,10 +22,10 @@
 
             var points = controller.calculate();
 
-
-            var header = [['Time', 'Velocity', 'Position']];
+            var header = [['Time',  'Velocity', 'Position']];
+            if(points[0].length==4)
+                header = [['Time','Acceleration', 'Velocity', 'Position']];
             var chartData = header.concat(points);
-            debugger;
 
             var data = google.visualization.arrayToDataTable(chartData);
 
@@ -57,12 +57,20 @@
                             <option value="1">Triangular</option>
                             <option value="2">Trapezoidal</option>
                             <option value="3">Third option</option>
-
                         </select>
                     </div>
 
                 </li>
                 <li id="li_1">
+                    <div class="left">
+                        <label class="description" for="element_1">Initial Acceleration </label>
+                        <input data-ng-model="a0" id="Text1" name="element_1" class="text medium"  type="text" maxlength="255" value="" />
+                    </div>
+
+                    <div class="left">
+                        <label class="description" for="element_2">Final Acceleration </label>
+                        <input data-ng-model="af" id="Text2" name="element_2" class="text medium" type="text" maxlength="255" value="" />
+                    </div>
                     <div class="left">
                         <label class="description" for="element_1">Initial Velocity </label>
                         <input data-ng-model="v0" id="element_1" name="element_1" class="text medium"  type="text" maxlength="255" value="" />
