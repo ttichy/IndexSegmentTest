@@ -20,14 +20,14 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
     $scope.indexType = IndexEnum.TRAPEZOID;
 
     //save typing for testing
-    $scope.v0 = '5';
-    $scope.vf = '10';
+    $scope.v0 = '0';
+    $scope.vf = '0';
     $scope.s0 = '0';
-    $scope.sf = '27.5';
+    $scope.sf = '10';
     $scope.t0 = '0';
-    $scope.tf = '2';
-    $scope.a0 = '2';
-    $scope.af = '1';
+    $scope.tf = '10';
+    $scope.pvl = '1.3';
+    $scope.nvl = '-.12';
 
 
 
@@ -39,9 +39,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
             case IndexEnum.TRIANGULAR:
                 return CalculateTriangularSegment();
             case IndexEnum.TRAPEZOID:
-                if($scope.a0=='0' && $scope.af=='0')
                     return CalculateTrapezoidalSegment();
-                return CalculateTrapezoidalSegmentWithAcceleration();
             default:
                 return null;
         }
@@ -57,6 +55,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         var vf = parseFloat($scope.vf, 10);
         var s0 = parseFloat($scope.s0, 10);
         var sf = parseFloat($scope.sf, 10);
+
 
         var halfTime = (tf + t0) / 2;
 
@@ -79,8 +78,6 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         if (!withinEpsilon(distance, sf - s0, EPSILON))
             throw new Error("calculation did not pass distance check");
 
-
-
         var duration = tf - t0;
 
         var increment = duration / resolution;
@@ -89,18 +86,18 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         var result = new Array();
 
         //calculate acceleration 
-        var a0 = (vm-v0) / (halfTime - t0);
+        var a0 = (vm - v0) / (halfTime - t0);
         var t = t0;
 
         //doing first half
-        while (lessThan(t,halfTime,EPSILON)) {
+        while (lessThan(t, halfTime, EPSILON)) {
 
-            var s = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2);      // s = s0 + v0t + 1/2 at^2
+            var s = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2); // s = s0 + v0t + 1/2 at^2
             var v = v0 + a0 * t;
 
             //create time, velocity, distance point
             var point = [t, v, s];
-            
+
             //add point to result
             result.push(point);
 
@@ -112,16 +109,16 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         t = halfTime;
 
         //initial values in the middle of the triangle
-        var sInit = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2); 
+        var sInit = s0 + v0 * t + 0.5 * a0 * Math.pow(t, 2);
         var vInit = vm;
 
         a0 = (vf - vm) / (tf - halfTime);
 
-        while (lessThan(t,tf,EPSILON)) {
+        while (lessThan(t, tf, EPSILON)) {
 
-            var time = t - halfTime;        //account for time correctly
+            var time = t - halfTime; //account for time correctly
 
-            var s = sInit + vInit * time + 0.5 * a0 * Math.pow(time, 2);      // s = s0 + v0t + 1/2 at^2
+            var s = sInit + vInit * time + 0.5 * a0 * Math.pow(time, 2); // s = s0 + v0t + 1/2 at^2
             var v = vInit + a0 * time;
 
             //create time, velocity, distance point
@@ -150,7 +147,8 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         var vf = parseFloat($scope.vf, 10);     //final velocity
         var s0 = parseFloat($scope.s0, 10);     //initial position
         var sf = parseFloat($scope.sf, 10);     //final position
-
+        var pvl = parseFloat($scope.pvl, 10);
+        var nvl = parseFloat($scope.nvl, 10);
 
         var t1 = (tf + 2 * t0) / 3;
         var t2 = (2 * tf + t0) / 3;
@@ -165,30 +163,60 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         var A3 = (sf - s0 - A1 + a * v0 + c * vf - A5) / ((a + b + c) / b);
         var vm = A3 / b;
 
-        var A2 = a * vm - a * v0;
-        var A4 = c * vm - c * vf;
-
-        var distance = A1 + A2 + A3 + A4 + A5;
-        if (!withinEpsilon(distance,sf-s0,EPSILON))
-            throw new Error("calculation did not pass distance check");
-
         //calculation will be done in thirds
 
         var duration = tf - t0;
 
         var increment = duration / resolution;
-
         //initalize array
         var result = new Array();
 
-        //calculate acceleration 
-        var a0 = (vm-v0) / (t1 - t0);
         var t = t0;
+
+
+        if (vm <= pvl) {
+
+
+            var A2 = a * vm - a * v0;
+            var A4 = c * vm - c * vf;
+
+            var distance = A1 + A2 + A3 + A4 + A5;
+            if (!withinEpsilon(distance, sf - s0, EPSILON))
+                throw new Error("calculation did not pass distance check");
+
+//calculate acceleration 
+            var a0 = (vm - v0) / (t1 - t0);
+
+
+        } else {
+            //pvl is less then vm
+
+            //calculate the area that is "chopped off" by the lower velocity limit
+            var ts = duration / 3;
+            var c = (vm - pvl) * (ts / vm);
+
+            var Ac = c * (vm - pvl) / 2;
+            var AL = ts * (vm - pvl) + c * (vm - pvl);
+
+            //time tl - how much the middle segment needs to increase on each side in order to accomodate lower velocity
+            var tL = AL / pvl ;
+
+            var t1 = ts - c - tL;
+            var t2 = 2 * ts + c + tL    ;
+
+            var distance = (t1 * pvl)  + (tf - t0 - 2 * t1) * pvl;
+            if (!withinEpsilon(distance, sf - s0, EPSILON))
+                throw new Error("calculation did not pass distance check");
+
+            var a0 = (pvl - v0) / (t1 - t0);
+            vm = pvl;
+
+        }
 
         //doing first third
         while (lessThan(t, t1, EPSILON)) {
 
-            var s = s0 + v0 * (t-t0) + 0.5 * a0 * Math.pow(t-t0, 2);      // s = s0 + v0t + 1/2 at^2
+            var s = s0 + v0 * (t - t0) + 0.5 * a0 * Math.pow(t - t0, 2); // s = s0 + v0t + 1/2 at^2
             var v = v0 + a0 * (t - t0);
 
             //create time, velocity, distance point
@@ -205,16 +233,16 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         t = t1;
 
         //initial values in the middle of the triangle
-        var sInit = s0 + v0 * (t-t0) + 0.5 * a0 * Math.pow(t-t0, 2);
+        var sInit = s0 + v0 * (t - t0) + 0.5 * a0 * Math.pow(t - t0, 2);
         var vInit = vm;
 
         a0 = 0; //this is  a trap
 
         while (lessThan(t, t2, EPSILON)) {
 
-            var time = t - t1;        //account for time correctly
+            var time = t - t1; //account for time correctly
 
-            var s = sInit + vInit * time + 0.5 * a0 * Math.pow(time, 2);      // s = s0 + v0t + 1/2 at^2
+            var s = sInit + vInit * time + 0.5 * a0 * Math.pow(time, 2); // s = s0 + v0t + 1/2 at^2
             var v = vInit + a0 * time;
 
             //create time, velocity, distance point
@@ -232,16 +260,16 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
         t = t2;
 
         //initial values in the middle of the triangle
-        var sInit2 = sInit + vInit * (t-t1) + 0.5 * a0 * Math.pow(t-t1, 2);
+        var sInit2 = sInit + vInit * (t - t1) + 0.5 * a0 * Math.pow(t - t1, 2);
         var vInit2 = vm;
 
         a0 = (vf - vm) / (tf - t2);
 
         while (lessThan(t, tf, EPSILON)) {
 
-            var time = t - t2;        //account for time correctly
+            var time = t - t2; //account for time correctly
 
-            var s = sInit2 + vInit2 * time + 0.5 * a0 * Math.pow(time, 2);      // s = s0 + v0t + 1/2 at^2
+            var s = sInit2 + vInit2 * time + 0.5 * a0 * Math.pow(time, 2); // s = s0 + v0t + 1/2 at^2
             var v = vInit2 + a0 * time;
 
             //create time, velocity, distance point
@@ -253,6 +281,7 @@ indexSegmentApp.controller('IndexCtrl', function ($scope) {
             //increment time
             t += increment;
         }
+
 
         return result;
 
